@@ -10,11 +10,14 @@ jobs:
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@v2
-    - name: build and package
+    - name: build
       run: |
         bundle install
         bundle exec pod install
         xcodebuild -workspace pusher.xcworkspace -scheme pusher -configuration Release build SYMROOT=$(PWD)/build
+    - name: package
+      run: |
+        git fetch --prune --unshallow --tags
         CURRENT_TAG=${GITHUB_REF#refs/tags/}
         PREVIOUS_TAG=$(git tag -l --sort=-creatordate | head -2 | tail -1)
         git log --pretty=format:"* %s" $PREVIOUS_TAG...$CURRENT_TAG > changelog.txt
