@@ -15,11 +15,11 @@ jobs:
         bundle install
         bundle exec pod install
         xcodebuild -workspace pusher.xcworkspace -scheme pusher -configuration Release build SYMROOT=$(PWD)/build
-        cd build/Release
-        zip -vrX PushTester.zip PushTester.app
         CURRENT_TAG=${GITHUB_REF#refs/tags/}
         PREVIOUS_TAG=$(git tag -l --sort=-creatordate | head -2 | tail -1)
         git log --pretty=format:"* %s" $PREVIOUS_TAG...$CURRENT_TAG > changelog.txt
+        cd build/Release
+        zip -vrX PushTester.zip PushTester.app
     - name: create release
       id: create_release
       uses: actions/create-release@v1
@@ -28,7 +28,7 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: v${{ github.ref }} Push Tester app
-        body_path: ./build/Release/changelog.txt
+        body_path: ./changelog.txt
         draft: false
         prerelease: false
     - name: upload release asset pkg
